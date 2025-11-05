@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.iml
+*.swp
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+*.log.*
+nohup.out
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.cache/
+.eslintcache
+.parcel-cache/
+
+# Vite
+frontend/dist/
+frontend/.vite/
+
+# Test coverage
+coverage/
+
+# Java / Maven / Spring
+backend/target/
+*.class
+*.war
+*.ear
+
+# Maven Wrapper JAR (can be regenerated)
+backend/.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar
+
+
