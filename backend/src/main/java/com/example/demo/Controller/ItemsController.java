@@ -75,4 +75,28 @@ public class ItemsController {
             ));
         }
     }
+    
+    // Get user's own listings (requires authentication)
+    @GetMapping("api/my-listings")
+    public ResponseEntity<?> getMyListings(Authentication authentication) {
+        try {
+            if (authentication == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized", "message", "Authentication required"));
+            }
+            
+            String userId = JwtUtils.getUserId(authentication);
+            if (userId == null || userId.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of("error", "Could not extract user ID from token"));
+            }
+            
+            List<Items> items = itemService.getItems(userId);
+            return ResponseEntity.ok(items);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Failed to fetch listings",
+                "message", e.getMessage()
+            ));
+        }
+    }
 }

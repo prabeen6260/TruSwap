@@ -5,11 +5,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Data;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @Document(collection = "items")
 public class Items {
     @Id
+    @JsonProperty("id")
     private long usserId;
     private String itemName;
     private String category;

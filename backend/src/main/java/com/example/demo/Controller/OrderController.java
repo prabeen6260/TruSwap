@@ -55,6 +55,36 @@ public class OrderController {
         }
     }
     
+    // Get sold items (orders where user is the seller)
+    @GetMapping("/orders/sold")
+    public ResponseEntity<?> getSoldItems(Authentication authentication) {
+        try {
+            if (authentication == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized", "message", "Authentication required"));
+            }
+            
+            // Use userId instead of email for more reliable matching
+            String userId = JwtUtils.getUserId(authentication);
+            if (userId == null || userId.isEmpty()) {
+                // Fallback to email if userId not available
+                String userEmail = JwtUtils.getEmail(authentication);
+                if (userEmail == null || userEmail.isEmpty()) {
+                    return ResponseEntity.status(401).body(Map.of("error", "Could not extract user ID or email from token"));
+                }
+                List<Order> orders = orderService.getOrdersBySeller(userEmail);
+                return ResponseEntity.ok(orders);
+            }
+            
+            // Use userId to find orders - get all listings owned by user, then find orders for those listings
+            List<Order> orders = orderService.getOrdersBySellerUserId(userId);
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            System.out.println("Error in getSoldItems: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+    
     // Get all orders (for admin - optional)
     @GetMapping("/orders/all")
     public ResponseEntity<List<Order>> getAllOrders() {

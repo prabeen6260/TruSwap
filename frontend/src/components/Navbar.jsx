@@ -71,31 +71,32 @@ function Navbar() {
 
         <nav className="ml-auto flex items-center gap-3">
           <NavLink to="/listings" className="btn-outline">Browse</NavLink>
-          <NavLink to="/wishlist" className="btn-outline relative">
-            Wishlist
-            {wishlistCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {wishlistCount > 9 ? '9+' : wishlistCount}
-              </span>
-            )}
-          </NavLink>
           {isAuthenticated && (
-            <NavLink to="/orders" className="btn-outline">Orders</NavLink>
+            <NavLink to="/profile" className="btn-outline relative">
+              Profile
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {wishlistCount > 9 ? '9+' : wishlistCount}
+                </span>
+              )}
+            </NavLink>
           )}
           {isAuthenticated ? (
             <>
               <NavLink to="/sell" className="btn-primary">Sell an item</NavLink>
               <div className="flex items-center gap-3">
-                {user?.picture && (
-                  <img
-                    src={user.picture}
-                    alt={user.name || 'User'}
-                    className="h-8 w-8 rounded-full"
-                  />
-                )}
-                <div className="hidden md:block text-sm">
-                  <div className="font-medium text-gray-900">{user?.name || user?.email}</div>
-                </div>
+                <Link to="/profile" className="flex items-center gap-2">
+                  {user?.picture && (
+                    <img
+                      src={user.picture}
+                      alt={user.name || 'User'}
+                      className="h-8 w-8 rounded-full"
+                    />
+                  )}
+                  <div className="hidden md:block text-sm">
+                    <div className="font-medium text-gray-900">{user?.name || user?.email}</div>
+                  </div>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="btn-outline text-sm"

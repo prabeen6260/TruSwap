@@ -12,8 +12,12 @@ const api = axios.create({
 
 // Transform backend data to frontend format
 const transformListingFromBackend = (item) => {
+  // Prefer explicit listing identifiers and keep seller IDs separate
+  const listingId = item.id ?? item.listingId ?? item.itemId ?? item._id ?? item.usserId ?? null
+  const sellerId = item.userId ?? null
+
   return {
-    id: item.usserId?.toString() || item.userId?.toString() || item.id,
+    id: listingId != null ? listingId.toString() : null,
     title: item.itemName || item.title,
     description: item.description,
     category: item.category,
@@ -22,7 +26,7 @@ const transformListingFromBackend = (item) => {
     imageUrl: item.imageUrl,
     name: item.name,
     email: item.email,
-    userId: item.userId,
+    userId: sellerId,
     datePosted: item.datePosted,
     isSold: item.isSold || false,
   }
@@ -209,5 +213,48 @@ export const fetchOrders = async (token) => {
   }
 }
 
-export default api
+// Fetch user's own listings
+export const fetchMyListings = async (token) => {
+  try {
+    const headers = {}
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+    
+    const response = await api.get('/my-listings', { headers })
+    const data = response.data
+    if (Array.isArray(data)) {
+      return data.map(transformListingFromBackend)
+    }
+    return []
+  } catch (error) {
+    const errorInfo = getErrorMessage(error)
+    console.error('Error fetching my listings:', errorInfo)
+    const enhancedError = new Error(errorInfo.message)
+    enhancedError.status = errorInfo.status
+    enhancedError.details = errorInfo.details
+    throw enhancedError
+  }
+}
 
+// Fetch sold items (orders where user is seller)
+export const fetchSoldItems = async (token) => {
+  try {
+    const headers = {}
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+    
+    const response = await api.get('/orders/sold', { headers })
+    return Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    const errorInfo = getErrorMessage(error)
+    console.error('Error fetching sold items:', errorInfo)
+    const enhancedError = new Error(errorInfo.message)
+    enhancedError.status = errorInfo.status
+    enhancedError.details = errorInfo.details
+    throw enhancedError
+  }
+}
+
+export default api

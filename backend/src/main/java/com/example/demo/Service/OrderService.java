@@ -53,6 +53,28 @@ public class OrderService {
         return orderRepo.findByBuyerUserId(buyerUserId);
     }
     
+    // Get orders by seller email
+    public List<Order> getOrdersBySeller(String sellerEmail) {
+        return orderRepo.findBySellerEmail(sellerEmail);
+    }
+    
+    // Get orders by seller user ID (more reliable - finds orders for items owned by user)
+    public List<Order> getOrdersBySellerUserId(String sellerUserId) {
+        // Get all listings owned by this user
+        List<Items> userListings = itemRepo.findByUserId(sellerUserId);
+        // Extract listing IDs
+        List<Long> listingIds = userListings.stream()
+            .map(Items::getUsserId)
+            .map(Long::valueOf)
+            .toList();
+        
+        // Find all orders for these listings
+        List<Order> allOrders = orderRepo.findAll();
+        return allOrders.stream()
+            .filter(order -> order.getListingId() != null && listingIds.contains(order.getListingId()))
+            .toList();
+    }
+    
     // Get all orders (for admin)
     public List<Order> getAllOrders() {
         return orderRepo.findAll();

@@ -10,6 +10,7 @@ import ListingDetailPage from './pages/ListingDetailPage.jsx'
 import CreateListingPage from './pages/CreateListingPage.jsx'
 import WishlistPage from './pages/WishlistPage.jsx'
 import OrderHistoryPage from './pages/OrderHistoryPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
 import PayPalCheckoutPage from './pages/PayPalCheckoutPage.jsx'
 import PaymentSuccessPage from './pages/PaymentSuccessPage.jsx'
 import PaymentCancelPage from './pages/PaymentCancelPage.jsx'
@@ -31,6 +32,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OrderHistoryPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />
