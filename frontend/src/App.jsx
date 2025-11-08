@@ -11,6 +11,9 @@ import CreateListingPage from './pages/CreateListingPage.jsx'
 import WishlistPage from './pages/WishlistPage.jsx'
 import OrderHistoryPage from './pages/OrderHistoryPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
+import GroupsPage from './pages/GroupsPage.jsx'
+import CreateGroupPage from './pages/CreateGroupPage.jsx'
+import GroupDetailPage from './pages/GroupDetailPage.jsx'
 import PayPalCheckoutPage from './pages/PayPalCheckoutPage.jsx'
 import PaymentSuccessPage from './pages/PaymentSuccessPage.jsx'
 import PaymentCancelPage from './pages/PaymentCancelPage.jsx'
@@ -54,6 +57,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/groups" element={<GroupsPage />} />
+            <Route
+              path="/groups/create"
+              element={
+                <ProtectedRoute>
+                  <CreateGroupPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/groups/:id" element={<GroupDetailPage />} />
             <Route path="/auth-error" element={<AuthError />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

@@ -71,6 +71,7 @@ function Navbar() {
 
         <nav className="ml-auto flex items-center gap-3">
           <NavLink to="/listings" className="btn-outline">Browse</NavLink>
+          <NavLink to="/groups" className="btn-outline">Groups</NavLink>
           {isAuthenticated && (
             <NavLink to="/profile" className="btn-outline relative">
               Profile

@@ -27,6 +27,8 @@ const transformListingFromBackend = (item) => {
     name: item.name,
     email: item.email,
     userId: sellerId,
+    groupId: item.groupId || null,
+    listingType: item.listingType || 'sell',
     datePosted: item.datePosted,
     isSold: item.isSold || false,
   }
@@ -43,6 +45,8 @@ const transformListingToBackend = (item) => {
     imageUrl: item.imageUrl,
     name: item.name,
     email: item.email,
+    groupId: item.groupId || null,
+    listingType: item.listingType || 'sell',
   }
 }
 
@@ -250,6 +254,76 @@ export const fetchSoldItems = async (token) => {
   } catch (error) {
     const errorInfo = getErrorMessage(error)
     console.error('Error fetching sold items:', errorInfo)
+    const enhancedError = new Error(errorInfo.message)
+    enhancedError.status = errorInfo.status
+    enhancedError.details = errorInfo.details
+    throw enhancedError
+  }
+}
+
+// Fetch all groups
+export const fetchGroups = async () => {
+  try {
+    const response = await api.get('/groups')
+    return Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    const errorInfo = getErrorMessage(error)
+    console.error('Error fetching groups:', errorInfo)
+    const enhancedError = new Error(errorInfo.message)
+    enhancedError.status = errorInfo.status
+    enhancedError.details = errorInfo.details
+    throw enhancedError
+  }
+}
+
+// Fetch a single group by ID
+export const fetchGroupById = async (id) => {
+  try {
+    const response = await api.get(`/groups/${id}`)
+    return response.data
+  } catch (error) {
+    const errorInfo = getErrorMessage(error)
+    console.error('Error fetching group:', errorInfo)
+    const enhancedError = new Error(errorInfo.message)
+    enhancedError.status = errorInfo.status
+    enhancedError.details = errorInfo.details
+    throw enhancedError
+  }
+}
+
+// Fetch user's groups
+export const fetchMyGroups = async (token) => {
+  try {
+    const headers = {}
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+    
+    const response = await api.get('/groups/my-groups', { headers })
+    return Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    const errorInfo = getErrorMessage(error)
+    console.error('Error fetching my groups:', errorInfo)
+    const enhancedError = new Error(errorInfo.message)
+    enhancedError.status = errorInfo.status
+    enhancedError.details = errorInfo.details
+    throw enhancedError
+  }
+}
+
+// Create a new group
+export const createGroup = async (groupData, token) => {
+  try {
+    const headers = {}
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+    
+    const response = await api.post('/groups', groupData, { headers })
+    return response.data
+  } catch (error) {
+    const errorInfo = getErrorMessage(error)
+    console.error('Error creating group:', errorInfo)
     const enhancedError = new Error(errorInfo.message)
     enhancedError.status = errorInfo.status
     enhancedError.details = errorInfo.details

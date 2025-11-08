@@ -22,6 +22,8 @@ public class Items {
     private String name;
     private String email;
     private String userId;
+    private String groupId; // Optional: ID of the group this item belongs to
+    private String listingType = "sell"; // "sell" or "rent" - default to "sell"
     
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime datePosted;

@@ -46,6 +46,9 @@ public class ItemService {
         newItem.setName(itemsDto.getName());
         newItem.setEmail(itemsDto.getEmail());
         newItem.setUserId(userId);
+        newItem.setGroupId(itemsDto.getGroupId()); // Set group ID if provided
+        newItem.setListingType(itemsDto.getListingType() != null && !itemsDto.getListingType().isEmpty() 
+            ? itemsDto.getListingType() : "sell"); // Default to "sell" if not provided
         newItem.setDatePosted(LocalDateTime.now());
         newItem.setIsSold(false);
         return itemRepo.save(newItem);

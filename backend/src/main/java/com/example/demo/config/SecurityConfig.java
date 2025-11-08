@@ -54,10 +54,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Public endpoints - no auth required
                 .requestMatchers("/api/listings", "/api/listings/**").permitAll()
+                .requestMatchers("/api/groups", "/api/groups/{id}").permitAll() // Public group browsing
                 // PayPal payment execution - public (called from frontend after PayPal approval)
                 .requestMatchers("/api/payments/execute").permitAll()
                 // Protected endpoints - require authentication
-                .requestMatchers("/api/createListing", "/api/my-listings", "/api/orders", "/api/orders/sold", "/api/payments/create-payment").authenticated()
+                .requestMatchers("/api/createListing", "/api/my-listings", "/api/orders", "/api/orders/sold", "/api/payments/create-payment", "/api/groups/my-groups").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/groups").authenticated() // Creating groups requires auth
                 .anyRequest().permitAll()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
-import { fetchListingById, createPayPalPayment } from '../services/api.js'
+import { fetchListingById, createPayPalPayment, fetchGroupById } from '../services/api.js'
 import { addToWishlist, removeFromWishlist, isInWishlist } from '../utils/wishlist.js'
 import { formatRelativeTime, formatDateTime, isRecent } from '../utils/dateUtils.js'
 
@@ -10,6 +10,7 @@ function ListingDetailPage() {
   const navigate = useNavigate()
   const { isAuthenticated, getAccessTokenSilently, user } = useAuth0()
   const [listing, setListing] = useState(null)
+  const [group, setGroup] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [inWishlist, setInWishlist] = useState(false)
@@ -24,6 +25,17 @@ function ListingDetailPage() {
         // Check if item is in wishlist
         if (data?.id) {
           setInWishlist(isInWishlist(data.id))
+        }
+        
+        // Load group information if listing belongs to a group
+        if (data?.groupId) {
+          try {
+            const groupData = await fetchGroupById(data.groupId)
+            setGroup(groupData)
+          } catch (err) {
+            console.error('Could not load group:', err)
+            // Continue without group info
+          }
         }
       } catch (err) {
         console.error('Failed to load listing:', err)
@@ -53,13 +65,13 @@ function ListingDetailPage() {
     if (!listing?.id || isProcessing) return
     
     if (!isAuthenticated) {
-      alert('Please log in to purchase items.')
+      alert(`Please log in to ${listing.listingType === 'rent' ? 'rent' : 'purchase'} items.`)
       return
     }
     
-    // Check if item is already sold
+    // Check if item is already sold/rented
     if (listing.isSold) {
-      alert('This item has already been sold.')
+      alert(`This item has already been ${listing.listingType === 'rent' ? 'rented' : 'sold'}.`)
       return
     }
     
@@ -133,7 +145,19 @@ function ListingDetailPage() {
         <div>
           <div className="flex items-start justify-between mb-2">
             <div>
-              <h1 className="text-2xl font-bold">{listing.title}</h1>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-2xl font-bold">{listing.title}</h1>
+                {listing.listingType === 'rent' && !listing.isSold && (
+                  <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full">
+                    RENT
+                  </span>
+                )}
+                {listing.listingType === 'sell' && !listing.isSold && (
+                  <span className="bg-brand/10 text-brand text-xs font-semibold px-2 py-1 rounded-full">
+                    SELL
+                  </span>
+                )}
+              </div>
               <div className="text-gray-600 mt-1">{listing.category} • {listing.condition}</div>
             </div>
             {isRecent(listing.datePosted) && (
@@ -153,12 +177,38 @@ function ListingDetailPage() {
               <span title={formatDateTime(listing.datePosted)}>{formatDateTime(listing.datePosted)}</span>
             </div>
           )}
+          
+          {group && (
+            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-blue-900">Part of Group</div>
+                  <Link 
+                    to={`/groups/${group.id}`}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                  >
+                    {group.name} →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
 
-          <div className="mt-4 text-3xl font-bold">${listing.price}</div>
+          <div className="mt-4">
+            <span className="text-3xl font-bold">${listing.price}</span>
+            {listing.listingType === 'rent' && !listing.isSold && (
+              <span className="text-lg text-gray-600 ml-2">/rental</span>
+            )}
+          </div>
 
           {listing.isSold && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 font-semibold text-center">This item has been sold</p>
+              <p className="text-red-700 font-semibold text-center">
+                This item has been {listing.listingType === 'rent' ? 'rented' : 'sold'}
+              </p>
             </div>
           )}
 
@@ -169,7 +219,11 @@ function ListingDetailPage() {
                 disabled={isProcessing}
                 className="btn-primary w-full mb-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isProcessing ? 'Processing...' : 'Buy Now'}
+                {isProcessing 
+                  ? 'Processing...' 
+                  : listing.listingType === 'rent' 
+                    ? 'Rent Now' 
+                    : 'Buy Now'}
               </button>
             )}
             <div className="font-semibold">Seller</div>
