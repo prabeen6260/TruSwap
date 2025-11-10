@@ -130,7 +130,7 @@ function AuthError() {
             >
               Try Again
             </button>
-            <button
+            {/* <button
               onClick={() => {
                 // Force account selection immediately without clearing first
                 loginWithRedirect({
@@ -145,7 +145,7 @@ function AuthError() {
               className="btn-outline w-full"
             >
               Login with Different Account
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
