@@ -21,7 +21,7 @@ import com.example.demo.util.JwtUtils;
 
 @RequestMapping
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "https://tru-swap.vercel.app", "https://tru-swap-git-main-prabeen6260s-projects.vercel.app"})
 public class ItemsController {
     private final ItemService itemService;
     

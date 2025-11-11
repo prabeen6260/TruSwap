@@ -34,7 +34,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        // Use allowedOriginPatterns to support wildcards (for Cloud Run)
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:*",
+            "https://tru-swap.vercel.app",
+            "https://tru-swap-git-main-prabeen6260s-projects.vercel.app",
+            "https://*.run.app" // Cloud Run URL pattern
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -71,7 +77,17 @@ public class SecurityConfig {
             .exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint((request, response, authException) -> {
                     // Allow CORS headers even for unauthorized requests
-                    response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+                    String origin = request.getHeader("Origin");
+                    if (origin != null && (
+                        origin.startsWith("http://localhost:") || 
+                        origin.equals("https://tru-swap.vercel.app") ||
+                        origin.equals("https://tru-swap-git-main-prabeen6260s-projects.vercel.app") ||
+                        origin.endsWith(".run.app") // Cloud Run URLs
+                    )) {
+                        response.setHeader("Access-Control-Allow-Origin", origin);
+                    } else {
+                        response.setHeader("Access-Control-Allow-Origin", "https://tru-swap.vercel.app");
+                    }
                     response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                     response.setHeader("Access-Control-Allow-Headers", "*");
                     response.setHeader("Access-Control-Allow-Credentials", "true");

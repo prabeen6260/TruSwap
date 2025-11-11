@@ -1,0 +1,46 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/truswap-backend:$BUILD_ID', '-t', 'gcr.io/$PROJECT_ID/truswap-backend:latest', '.']
+  
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/truswap-backend:$BUILD_ID']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/truswap-backend:latest']
+  
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'truswap-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/truswap-backend:$BUILD_ID'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+      - '--set-env-vars'
+      - 'MONGODB_URI=${_MONGODB_URI},MONGODB_DATABASE=${_MONGODB_DATABASE},AUTH0_ISSUER_URI=${_AUTH0_ISSUER_URI},AUTH0_AUDIENCE=${_AUTH0_AUDIENCE},PAYPAL_CLIENT_ID=${_PAYPAL_CLIENT_ID},PAYPAL_CLIENT_SECRET=${_PAYPAL_CLIENT_SECRET},PAYPAL_MODE=${_PAYPAL_MODE},PAYPAL_BASE_URL=${_PAYPAL_BASE_URL}'
+
+images:
+  - 'gcr.io/$PROJECT_ID/truswap-backend:$BUILD_ID'
+  - 'gcr.io/$PROJECT_ID/truswap-backend:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
