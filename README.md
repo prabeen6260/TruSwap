@@ -12,8 +12,9 @@ Key Features & Impact
 
     Tech Stack: Built on Spring Boot (Java API), React (Frontend), and MongoDB (Database).
 
-Layer,Technology,Purpose
-Backend,"Spring Boot (Java), MongoDB",REST API and persistence
-Frontend,React,Single Page Application (SPA) user interface
-Auth/Payments,"Auth0, PayPal",Secure user management and transaction processing
-Deployment,"Docker, Google Cloud Run, Vercel",Containerization and scalable cloud hosting
+🛠️ Tech Stack Highlights
+Layer	Technology	Purpose
+Backend	Spring Boot (Java), MongoDB	REST API and persistence
+Frontend	React	Single Page Application (SPA) user interface
+Auth/Payments	Auth0, PayPal	Secure user management and transaction processing
+Deployment	Docker, Google Cloud Run, Vercel	Containerization and scalable cloud hosting
